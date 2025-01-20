@@ -31,3 +31,13 @@ document.querySelectorAll('.tom-tag').forEach((el)=>{
 		//  }
 	 });
 });
+
+const kekw = document.getElementsByTagName('fieldset');
+console.log(kekw);
+[...kekw].forEach((el)=>{
+	console.log(el)
+	let par = el.parentNode;
+	console.log(par)
+	par.classList.add('pack-contents');
+});
+

@@ -66,12 +66,15 @@ class SmartForm(forms.ModelForm):
     tag_options = [('', 'None')] + [(tag.tag_name, tag.tag_name) for tag in Tag.objects.all()]
     field_options = [('', 'None')] + [(field.field_name, field.field_name) for field in ApplicationField.objects.all()]
 
-    # price_range_start = MoneyField(max_digits=14, decimal_places=2, default_currency='PLN')
-    # price_range_end = MoneyField(max_digits=14, decimal_places=2, default_currency='PLN')
-    price_range = MoneyField(widget = MultiWidget(attrs={'class': 'mx-2 col-4 mb-2'},
-        widgets={'start': MoneyWidget(default_currency='PLN'), 'end': MoneyWidget(default_currency='PLN')}))
     # currency_widget = forms.Select(attrs={'class': 'form-control'})
+    # price_range = MoneyField(default_currency='PLN',
+    #     widget = MultiWidget(attrs={'class': 'mx-2 col-4 mb-2'},
+    #         widgets={'start': MoneyWidget, 'end': MoneyWidget}
+    #     )
+    # )
 
+    price_range_start = MoneyField(widget=MoneyWidget(attrs={'class': 'col-4 textarea half-form-control mx-2 mb-2'}),max_digits=14, decimal_places=2, default_currency='PLN')
+    price_range_end = MoneyField(widget=MoneyWidget(attrs={'class': 'textarea half-form-control mx-2 col-4 mb-2'}), max_digits=14, decimal_places=2, default_currency='PLN')
     tag = forms.CharField(widget=forms.SelectMultiple(attrs={'rows': 1, 'class': 'tom-tag', "novalidate": ''}, choices=tag_options),#ListTextWidget(data_list=(('a', 'a'), ('b', 'b')), name='country-list', attrs={'class': 'tom-Tag'}),
                 )       # queryset=Tag.objects.all(),| , label=lambda instance: instance.tag_name
     application_field = forms.CharField(widget=forms.SelectMultiple(choices=field_options, attrs={'rows': 1, 'class': 'tom-tag', "novalidate": ''}),#ListTextWidget(data_list=(('a', 'a'), ('b', 'b')), name='country-list', attrs={'class': 'tom-Tag'}),
@@ -82,16 +85,18 @@ class SmartForm(forms.ModelForm):
         super(SmartForm, self).__init__(*args, **kwargs)
         self.fields['tag'].label_from_instance = lambda instance: instance.tag_name # this simply uses chosen field as label
         self.fields['application_field'].label_from_instance = lambda instance: instance.field_name
+        # self.fields['price_range_start'].label_classes = "f_sized"
         
     class Meta:
         model = Smart
-        fields = ['project_name', 'how_it_works',  'userbase', 'similiar_software', 'details']   #'tag', 'application_field',
+        fields = ['project_name', 'how_it_works',  'userbase', 'similiar_software', 'details', 'price_range']   #'tag', 'application_field',
 
         widgets = {
             'project_name': forms.Textarea(attrs={'rows': 1, 'cols': 5}),
             'how_it_works': forms.Textarea(attrs={'rows': 2}),
             # 'tag': forms.SelectMultiple(attrs={'rows': 1, 'class': 'tom-Tag', 'background-color': 'red'}),
             # 'application_field': forms.Textarea(attrs={'rows': 1, 'id': 'tom-Tag'}),
+            'price_range': forms.HiddenInput(),
             'userbase': forms.Textarea(attrs={'rows': 1}),
             'similiar_software': forms.Textarea(attrs={'rows': 1}),
             'details': forms.Textarea(attrs={'rows': 8}),

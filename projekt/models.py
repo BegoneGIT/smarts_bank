@@ -52,7 +52,7 @@ class Smart(models.Model):
     delete_order_date = models.DateField(null=True, blank=True)
     tag = models.ManyToManyField(Tag)
     application_field = models.ManyToManyField(ApplicationField)
-    price_range = models.ForeignKey(PriceRange, on_delete=models.CASCADE)
+    price_range = models.ForeignKey(PriceRange, on_delete=models.CASCADE, blank=True)
     slug = models.SlugField()
 
     def save(self, *args, **kwargs):

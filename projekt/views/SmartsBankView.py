@@ -5,7 +5,8 @@ from django.db import transaction
 
 # from django.views import View, ListView
 from django.views.generic import DetailView, UpdateView, FormView, ListView, View, DeleteView, CreateView
-from ..models import Smart, Tag, ApplicationField
+from djmoney.money import Money
+from ..models import Smart, Tag, ApplicationField, PriceRange
 from ..forms import SmartForm
 # import projekt.models     # this causes an error, check how to properly import models
 # from .forms import YourModelForm
@@ -79,25 +80,28 @@ class SmartCreateView(CreateView):
         # form.save(commit=False)
 
         # smart = form.instance
-        print('???????????')
-
         with transaction.atomic():
             # print(smart)
             # print(smart.how_it_works)
+            
             smart = form.save(commit=False)
             smart.created_by = self.request.user
+            # quit()
+            print(form.cleaned_data['price_range_start'].amount)
+            # input_price_start = form.cleaned_data['price_range_start_0'][0], form.cleaned_data['price_range_start_1'][0]
+            # input_price_end = form.cleaned_data['price_range_end_0'][0], form.cleaned_data['price_range_end_1'][0]
+            # print(input_price_start[0])
+            # print(input_price_end)
+            real_range, _ = PriceRange.objects.get_or_create(price_start=form.cleaned_data['price_range_start'], price_end=form.cleaned_data['price_range_end'])
+            smart.price_range = real_range
             smart.save()
-            print(self.request.user)
-            form_cont = dict(self.request.POST)
+
             # NOTE we would love to use form.cleaned_data, but it will make our inputs a str
+            form_cont = dict(self.request.POST)
             input_tags = self.no_dupe_lowercase(form_cont['tag'])   #form_cont['Ttag']     # lower case and remove duplicates
             input_fields = self.no_dupe_lowercase(form_cont['application_field'])
 
-            input_price = form_cont['price_range']
-            print('what is input price', input_price)
-            
-            quit()
-            
+
             tags=[]
             for name in input_tags:
                 tag, created = Tag.objects.get_or_create(tag_name=name)
@@ -117,8 +121,7 @@ class SmartCreateView(CreateView):
                 a_fields.append(a_field)
             smart.application_field.set(a_fields)
 
-        # print('ARE THOSE THINGS CALLED EVEN?')
-        # smart.save()
+            # smart.save()
         # return HttpResponseRedirect(reverse("bank-main"))#self.get_success_url()
         return redirect("bank-main")#super(SmartCreateView, self).form_valid(form)
     
