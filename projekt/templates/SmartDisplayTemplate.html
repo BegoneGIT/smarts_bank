@@ -1,0 +1,70 @@
+{% extends 'base_template.html' %}
+
+{% block content %}
+<h1 class="my-4">{{ smart.project_name }}</h1>
+<div class="container">
+    <div class="row">
+    {% comment %} <a href="#" class="list-group-item list-group-item-action flex-column align-items-start"> {% endcomment %}
+        <div class="col-8">
+            <div class="container">
+
+                <div class="row m-2">tags: 
+                    {% for tag in smart.tag.all %}
+                        <span> {{ tag.tag_name }} </span>
+                    {% endfor %}
+                </div>
+                <div class="row m-2">SIMILIAR SOFT
+                    {{ smart.similiar_software }}
+                </div>
+                <div class="row m-2">FIELD OF USE
+                    {% for field in smart.application_field.all %}
+                        <span> {{ field.field_name }} </span>
+                    {% endfor %}
+                </div>
+                <div class="row m-2">
+                    {{ smart.how_it_works }}
+                </div>
+                <div class="row m-2">DETAILS: 
+                    {{ smart.details }}
+                </div>
+                
+                <div class="row m-2">USERBASE:
+                    {{ smart.userbase }}
+                </div>
+                <div class="row m-2">price range:
+                    {{ smart.price_range.price_start }} - {{ smart.price_range.price_end }}; updated on: {{ smart.price_range.updated }}
+                </div>
+                <div class="row m-2">
+                    DESCRIPTION:
+                    {{ smart.description }}
+                </div>
+            </div>
+        </div>
+        <div class="container col-4 border rounded">
+            <div class="row m-2 mt-2">
+
+                created by: 
+                {% for author in smart.created_by.all %}
+                        <span> {{ author.username }} </span>
+                    {% endfor %}
+                {% comment %} {{ smart.created_by.username }} {% endcomment %}
+            </div>
+            {% if smart.delete_order_date %}
+            <div class="row m-2 container">
+                <div class="row mb-2">
+                    delete date: {{ smart.delete_order_date }}
+                </div>
+                <div class="row mb-2">
+                    marked for deletion_by: {{ smart.marked_for_del_by }}
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+        {% comment %} <p class="mb-1">item would be here: </p>
+        <small class="text-muted">button to vote for proj</small> {% endcomment %}
+    {% comment %} </a> {% endcomment %}
+    {% comment %} {% empty %} {% endcomment %}
+    <p>No items found.</p>
+</div>
+{% endblock %}
