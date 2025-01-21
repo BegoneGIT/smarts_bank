@@ -1,4 +1,5 @@
 {% extends 'base_template.html' %}
+{% load static %}
 
 {% block content %}
 <h1 class="my-4">{{ smart.project_name }}</h1>
@@ -8,31 +9,40 @@
         <div class="col-8">
             <div class="container">
 
-                <div class="row m-2">tags: 
-                    {% for tag in smart.tag.all %}
-                        <span> {{ tag.tag_name }} </span>
-                    {% endfor %}
-                </div>
-                <div class="row m-2">SIMILIAR SOFT
-                    {{ smart.similiar_software }}
-                </div>
-                <div class="row m-2">FIELD OF USE
-                    {% for field in smart.application_field.all %}
-                        <span> {{ field.field_name }} </span>
-                    {% endfor %}
+                <div class="row m-2">
+                    <span class="col-12">tags: </span>
+                    <div class="row m-2">
+                        {% for tag in smart.tag.all %}
+                            <span class="col-1 mr-2 rand-colored"> {{ tag.tag_name }} </span>
+                        {% endfor %}
+                    </div>
                 </div>
                 <div class="row m-2">
-                    {{ smart.how_it_works }}
+                    SIMILIAR SOFT: 
+                    <span class="col-12 mr-5">{{ smart.similiar_software }}</span>
                 </div>
-                <div class="row m-2">DETAILS: 
+                <div class="row m-2">
+                    Usage field:
+                    <div class="row m-2">
+                    {% for field in smart.application_field.all %}
+                        <span class="col-1 rand-colored"> {{ field.field_name }} </span>
+                    {% endfor %}
+                </div>
+            </div>
+                <div class="row m-2"> 
+                    How it works:
+                        <span class="col-12 mr-5">{{ smart.how_it_works }}</span>
+                </div>
+                <div class="row m-2">Details: 
                     {{ smart.details }}
                 </div>
                 
-                <div class="row m-2">USERBASE:
+                <div class="row m-2">Userbase:
                     {{ smart.userbase }}
                 </div>
-                <div class="row m-2">price range:
-                    {{ smart.price_range.price_start }} - {{ smart.price_range.price_end }}; updated on: {{ smart.price_range.updated }}
+                <div class="row m-2">Price range:
+                    {{ smart.price_range.price_start.amount }} {{ smart.price_range.price_start.currency }} - {{ smart.price_range.price_end.amount }} {{ smart.price_range.price_end.currency }}
+                    <span> Updated on: {{ smart.price_range.updated }} </span>
                 </div>
                 <div class="row m-2">
                     DESCRIPTION:
@@ -68,3 +78,7 @@
     <p>No items found.</p>
 </div>
 {% endblock %}
+{% block script %}
+<script src="{% static 'js/projekt/random_colors.js' %}"></script>
+{% endblock script %}
+

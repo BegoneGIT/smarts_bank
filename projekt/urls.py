@@ -17,6 +17,7 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 from projekt.views.SmartsBankView import SmartsBankView, SmartDisplayView, SmartCreateView
+from projekt.views.UsersView import AddUserView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -26,4 +27,6 @@ urlpatterns = [
          name="bank-smart"),
     path('create/smart/', SmartCreateView.as_view(),
          name="smart-create"),
+    path('create/user/', AddUserView.as_view(),
+         name="user-create"),
 ]

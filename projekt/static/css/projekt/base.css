@@ -83,3 +83,11 @@ legend {
     display:inline;
     float:left;
 }
+
+.rand-colored {
+    float:left;
+    padding: 0.5em;
+    margin: 3px; 
+    border-radius: 12px;
+    background-color: gray;
+}

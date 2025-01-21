@@ -5,7 +5,10 @@ from django.db import transaction
 
 # from django.views import View, ListView
 from django.views.generic import DetailView, UpdateView, FormView, ListView, View, DeleteView, CreateView
-from djmoney.money import Money
+
+from rolepermissions.mixins import HasPermissionsMixin
+
+# from djmoney.money import Money
 from ..models import Smart, Tag, ApplicationField, PriceRange
 from ..forms import SmartForm
 # import projekt.models     # this causes an error, check how to properly import models
@@ -62,16 +65,15 @@ class SmartDisplayView(DetailView):
     def get_context_data(self, **kwargs):        #  request, smart_id
         context = super(SmartDisplayView, self).get_context_data(**kwargs)
 
-        context['info'] = "fghjasvghjasfjhvfasdjhvfasvhj"
-
-        context['price_dict'] = {"element1": "123", "ele2": 547}
-
         context['smart'] = get_object_or_404(Smart, slug=kwargs['object'].slug)
-        print(context['smart'].created_by)
+        # print(context['smart'].created_by)
+        context['price_range'] = context['smart'].price_range
+        # print(context['price_range'].price_start.amount, type(context['price_range'].price_start))
 
         return context
 
-class SmartCreateView(CreateView):
+class SmartCreateView(HasPermissionsMixin, CreateView):
+    required_permission = 'create_smart'
     template_name = 'SmartCreateTemplate.html'
     model = Smart
     form_class = SmartForm
@@ -87,7 +89,7 @@ class SmartCreateView(CreateView):
             smart = form.save(commit=False)
             smart.created_by = self.request.user
             # quit()
-            print(form.cleaned_data['price_range_start'].amount)
+            # print(form.cleaned_data['price_range_start'].amount)
             # input_price_start = form.cleaned_data['price_range_start_0'][0], form.cleaned_data['price_range_start_1'][0]
             # input_price_end = form.cleaned_data['price_range_end_0'][0], form.cleaned_data['price_range_end_1'][0]
             # print(input_price_start[0])

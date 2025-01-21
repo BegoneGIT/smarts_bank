@@ -4,6 +4,9 @@ from .models import Smart, Tag, ApplicationField, PriceRange
 from djmoney.forms.widgets import MoneyWidget
 from djmoney.forms.fields import MoneyField
 
+from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth.models import User
+
 # class SmartForm(forms.Form):
 #     project_name = forms.CharField(max_length=100)
 #     details = forms.TextField()        # nullable?
@@ -102,39 +105,17 @@ class SmartForm(forms.ModelForm):
             'details': forms.Textarea(attrs={'rows': 8}),
         }
 
-    # def save(self, *args, **kwargs): 
-    #     # if not commit: 
-    #     #     raise NotImplementedError("Can't create User and Userextended without database save") 
-    #     smart = super().save(*args, **kwargs)
+'''
+interesting: https://stackoverflow.com/questions/46877213/django-create-customuser-model?rq=3
+'''
+class UserForm(UserCreationForm):   #forms.ModelForm, 
 
-    #     # create many2many records
-    #     print(smart.how_it_works)
-    #     input_tags = self.no_dupe_lowercase(smart.tag.all())     # lower case and remove duplicates
-    #     input_fields = self.no_dupe_lowercase(smart.application_field.all())
-    #     # price_range = smart.price_range
-    #     smart.tag.clear()#= None#.delete()
-    #     smart.application_field.clear()#= None#.delete()
-    #     # price_range.delete()
+    CHOICES = (
+        ('REG', 'reagular user'),
+        ('MAN', 'manager'),
+    )
+    assign_role = forms.ChoiceField(choices=CHOICES, required=False)      # or use Select
 
-    #     # smart.save()  # sum,ting wong
-
-    #     # print(self.request.user)
-    #     # raise Exception()
-    #     print('input_tags',input_tags)
-    #     print('input_fields',input_fields)
-    #     tag = Tag.objects.bulk_create(input_tags, batch_size=8, ignore_conflicts=True)
-    #     print(tag)
-    #     tag.save()
-    #     smart.tag.set(tag)        # this should work, else https://stackoverflow.com/questions/4959499/how-to-add-multiple-objects-to-manytomany-relationship-at-once-in-django
-
-    #     app_field = ApplicationField.objects.bulk_create(input_fields, batch_size=8, ignore_conflicts=True)
-    #     print(app_field)
-    #     app_field.save()
-    #     smart.application_field.set(app_field)
-
-    #     print('ARE THOSE THINGS CALLED EVEN?')
-
-    #     return smart
-    
-    # def no_dupe_lowercase(self, records: list)->set:
-    #     return set([r.lower() for r in records])     
+    class Meta:
+        model = User
+        fields = ('username', 'first_name' , 'last_name', 'email')
