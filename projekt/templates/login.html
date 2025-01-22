@@ -1,0 +1,24 @@
+{% extends 'base_template.html' %}
+{% load crispy_forms_tags %}
+{% load static %}
+{% comment %} {% block head %}
+    <link href="https://cdn.jsdelivr.net/npm/tom-select@2.4.1/dist/css/tom-select.css" rel="stylesheet">
+{% endblock %} {% endcomment %}
+{% block content %}
+<h1 class="my-4">{{ smart.project_name }}</h1>
+<div class="container w-40">
+    <div class="row">
+        <form action="{% url 'login' %}" method="post">
+            {% csrf_token %}
+            {{ form|crispy }}
+            <input type="submit" value="Submit">
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% comment %} {% block script %}
+<script src="https://cdn.jsdelivr.net/npm/tom-select@2.4.1/dist/js/tom-select.complete.min.js"></script>
+<script src="{% static 'js/projekt/create_form.js' %}"></script> 
+{% endblock %} 
+{% endcomment %}

@@ -11,6 +11,12 @@
     {% block head %}{% endblock %}
 </head>
 <body>
+    {% for message in messages %}
+    <div class="alert alert-dismissible {{ message.tags }}" role="alert">
+      <div>{{ message | safe }}</div>
+      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+  {% endfor %}
     <nav class="navbar navbar-expand-lg">
         <div class="container-fluid">
             <a class="navbar-brand" href="#">Corporate</a>
@@ -19,18 +25,28 @@
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto">
+                    {% if user.groups.all.0.name == "manager" or user.is_superuser %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'user-create' %}">Create new user</a>
+                        </li>
+                    {% endif %}
+                    {% if user.is_authenticated %}
+                    <li class="nav-item">
+                        <a class="nav-link mr-3">Logged in as {{user.username}}</a>
+                    </li>
+                    {% else %}
+                    <li class="nav-item">
+                        <a class="nav-link mr-3" href="{% url 'login' %}">Log in</a>
+                    </li>
+                    {% endif %}
                     <li class="nav-item">
                         <a class="nav-link" href="{% url 'bank-main' %}">Home</a>
                     </li>
-                    {% comment %} <li class="nav-item">
-                        <a class="nav-link" href="#">About</a>
-                    </li>
+                    {% comment %} <a class="nav-link" href="#">About</a> {% endcomment %}
+                     
                     <li class="nav-item">
-                        <a class="nav-link" href="#">Services</a>
+                        <a class="nav-link" href="{% url 'logout' %}">Logout</a>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#">Contact</a>
-                    </li> {% endcomment %}
                 </ul>
             </div>
         </div>

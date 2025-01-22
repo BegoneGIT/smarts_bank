@@ -16,8 +16,8 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-from projekt.views.SmartsBankView import SmartsBankView, SmartDisplayView, SmartCreateView
-from projekt.views.UsersView import AddUserView
+from projekt.views.SmartsBankView import SmartsBankView, SmartDisplayView, SmartCreateView, RegisterSmartVoteView
+from projekt.views.UsersView import AddUserView, UserLoginView, UserLogoutView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -29,4 +29,10 @@ urlpatterns = [
          name="smart-create"),
     path('create/user/', AddUserView.as_view(),
          name="user-create"),
+    path('accounts/login/', UserLoginView.as_view(),
+         name="login"),
+    path('logout/', UserLogoutView.as_view(),
+         name="logout"),
+    path('smart/vote/<slug:slug>', RegisterSmartVoteView.as_view(),
+         name="vote-smart"),
 ]

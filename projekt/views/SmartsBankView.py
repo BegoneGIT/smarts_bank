@@ -2,6 +2,10 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.http import HttpResponse, HttpResponseRedirect
 from django.urls import reverse
 from django.db import transaction
+from django.contrib import messages
+from django.contrib.auth.decorators import login_required
+from django.utils.decorators import method_decorator
+
 
 # from django.views import View, ListView
 from django.views.generic import DetailView, UpdateView, FormView, ListView, View, DeleteView, CreateView
@@ -9,7 +13,7 @@ from django.views.generic import DetailView, UpdateView, FormView, ListView, Vie
 from rolepermissions.mixins import HasPermissionsMixin
 
 # from djmoney.money import Money
-from ..models import Smart, Tag, ApplicationField, PriceRange
+from ..models import Smart, Tag, ApplicationField, PriceRange, SmartsVoting, CorpoTeam
 from ..forms import SmartForm
 # import projekt.models     # this causes an error, check how to properly import models
 # from .forms import YourModelForm
@@ -34,6 +38,7 @@ class SmartsBankView(ListView):
         # context['info'] = "fghjasvghjasfjhvfasdjhvfasvhj"
 
         # context['price_dict'] = {"element1": "123", "ele2": 547}
+        context['username'] = self.request.user.username
 
         context['smarts_list'] = Smart.objects.all()
 
@@ -58,6 +63,7 @@ class SmartsBankView(ListView):
     #     obj.delete()
     #     return HttpResponse(status=204)
 
+@method_decorator(login_required, name='dispatch')
 class SmartDisplayView(DetailView):
     template_name = 'SmartDisplayTemplate.html'
     model = Smart
@@ -71,6 +77,12 @@ class SmartDisplayView(DetailView):
         # print(context['price_range'].price_start.amount, type(context['price_range'].price_start))
 
         return context
+    
+    def dispatch(self, request, *args, **kwargs):
+        messages.success(self.info, "You have to log in to see the details")
+        
+        return super().dispatch(request, *args, **kwargs)
+    
 
 class SmartCreateView(HasPermissionsMixin, CreateView):
     required_permission = 'create_smart'
@@ -122,6 +134,8 @@ class SmartCreateView(HasPermissionsMixin, CreateView):
                 a_field, created = ApplicationField.objects.get_or_create(field_name=name)
                 a_fields.append(a_field)
             smart.application_field.set(a_fields)
+            messages.success(self.request, "Smart created successfully!")
+
 
             # smart.save()
         # return HttpResponseRedirect(reverse("bank-main"))#self.get_success_url()
@@ -135,4 +149,33 @@ class SmartCreateView(HasPermissionsMixin, CreateView):
         return context
 
     def no_dupe_lowercase(self, records: list)->set:
-            return set([r.lower() for r in records])     
+            return set([r.lower() for r in records])
+
+class RegisterSmartVoteView(DetailView):
+    model = Smart
+    template_name = 'SmartDisplayTemplate.html'
+
+    # def get_context_data(self, **kwargs):
+    # def get(self, request, **kwargs):
+    def get_context_data(self, **kwargs):        #  request, smart_id
+        context = super(RegisterSmartVoteView, self).get_context_data(**kwargs)
+        # self.object = self.get_object()
+        # context=super().get_context_data(**kwargs)
+        user = self.request.user
+        slug = self.request.GET.get('slug')
+        print("SLUG:", slug)
+        smart = get_object_or_404(Smart, slug=kwargs['object'].slug)
+        # smart = Smart.objects.get(slug=slug)
+
+        try:
+            SmartsVoting.objects.get_or_create(voter=user, voted_project=smart)
+            messages.info(self.request, "You successfully voted for a project.")
+        except Exception:
+            messages.error(self.request, "For some reason voting did not work properly. Check if you are logged in.")
+
+        redirect('bank-smart', slug=slug)
+        return context
+
+class CorpoTeamAssignView(CreateView):
+    model = CorpoTeam
+    template_name = ".html"

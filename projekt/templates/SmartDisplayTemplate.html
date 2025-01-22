@@ -69,6 +69,19 @@
                 </div>
             </div>
             {% endif %}
+            <div class="row m-2 container">
+                <div class="row mb-2">
+                    You can vote to work on this project.
+                </div>
+                <div class="row mb-2">
+                    <a href="{% url 'vote-smart' smart.slug %}">
+                        <button class="btn btn-success">Vote</button>
+                    </a>
+                </div>
+                {% comment %} <div class="row mb-2">
+                    To this point $ of your team members voted on that project
+                </div> {% endcomment %}
+            </div>
         </div>
     </div>
         {% comment %} <p class="mb-1">item would be here: </p>
