@@ -133,6 +133,16 @@ There isn't much that needs to be done to deploy
    git remote set-url origin github_username/repo_name
    git remote -v # confirm the changes
    ```
+4. Make database migrations and apply them. 
+    ```sh
+    py .\manage.py makemigrations projekt
+    py .\manage.py migrate
+    ```
+
+5. The full documentation is available at admin panel by **admindocs** django builtin module.
+
+6. If you are looking to deploy to WSGI please refer to original django documentation about deployment: https://docs.djangoproject.com/en/5.1/howto/deployment/wsgi/. The project functionalities do not need any additional actions if above documentation is followed.
+
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -144,8 +154,44 @@ There isn't much that needs to be done to deploy
 <!-- Use this space to show useful examples of how a project can be used. Additional screenshots, code examples and demos work well in this space. You may also link to more resources.
 
 _For more examples, please refer to the [Documentation](https://example.com)_ -->
-After initial setup it's possible to add all users by Create new users.
+After initial setup it's possible to add new users by Create new users.
 ![alt text](image.png)
+
+When in doubt about functionality of the specific subpages you should refer to view comments. General documentation is also available below.
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
+
+## Documentation
+#### Views
+There are two files that contain main "controllers" i.e. Django Views: SmartsBankView and UsersView. The latter controls login, logout and other user-centric activities.
+
+SmartsBankView governs creation of new 'smarts', allows users to vote on them and manages application behaviour related to those tasks.
+
+____ SmartsBankView ____
+##### SmartsBankView: Displays all uploaded projects and allows to inspect them
+##### SmartDisplayView: Display a singular 'smart' and supplies link that allow to vote and assign it it the programming team.
+##### SmartCreateView: Responsible for creating single 'smarts'. Creates price range automatically.If user decided to create new Tag or ApplicationField the view will also create new objects in database to represent them.
+##### RegisterSmartVoteView: "Saves information about user voting on specific 'smart'. Updates counter for that 'smart' to represent current vote count. If any kind of error happens, the appopriate non-persistent message is sent to inform user.
+##### SmartAssignTeamView: Assigns a 'smart' to the chosen team. Operation can only be undone from admin panel.
+
+
+____ UsersView ____
+##### UserLoginView: Simple view to allow for a login
+##### UserLogoutView: Logout view. We redirect to it and after logging them out we redirect to another view instantly. Therefore user should never see a template loaded.
+##### AddUserView: This is view supposed to be used by admins and managers. It will add an user to 'Smart' suggestion system. Be careful as manager can create another manager accounts (by design).
+
+#### Models
+Here are the database structures that contain essential functiona information.
+##### Tag: Simple model holding tags
+##### ApplicationField: This model contains ApplicationFields that are supposed to describe what kind of business field the project relates to
+##### PriceRange: This model says what is supposed market price of the similiar software
+##### CorpoTeam: Allows for simpler notification sending. Corpo teams are created from admin panel as only admins should have access to this action
+##### Smart: Project ideas are named 'smarts' and contain all usefull information about project
+##### SmartsVoting: Simple connection between voting user and project they voted for
+##### CorpoVoteCounter: Vote counter simplifies vote counting for specific teams and reduces overhead.
+#####
+#####
+
 
 
 

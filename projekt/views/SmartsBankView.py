@@ -22,6 +22,14 @@ from ..forms import SmartForm
 # from .forms import YourModelForm
 
 class SmartsBankView(ListView):
+    """Displays all uploaded projects and allows to inspect them
+
+    Args:
+        ListView (_type_): _description_
+
+    Returns:
+        _type_: _description_
+    """
     template_name = 'SmartsBankTemplate.html'
     model = Smart
     context_object_name = 'smarts'
@@ -68,6 +76,15 @@ class SmartsBankView(ListView):
 
 @method_decorator(login_required, name='dispatch')
 class SmartDisplayView(DetailView):
+    """Display a singular 'smart' and supplies link that allow to
+    vote and assign it it the programming team
+
+    Args:
+        DetailView (_type_): _description_
+
+    Returns:
+        _type_: _description_
+    """
     template_name = 'SmartDisplayTemplate.html'
     model = Smart
 
@@ -105,7 +122,7 @@ class SmartDisplayView(DetailView):
         
         return super().dispatch(request, *args, **kwargs)
     
-
+@method_decorator(login_required, name='dispatch')
 class SmartCreateView(HasPermissionsMixin, CreateView):
     """Responsible for creating single 'smarts'. Creates price range automatically.
     If user decided to create new Tag or ApplicationField the view will also create new
@@ -184,6 +201,7 @@ class SmartCreateView(HasPermissionsMixin, CreateView):
     def no_dupe_lowercase(self, records: list)->set:
             return set([r.lower() for r in records])
 
+@method_decorator(login_required, name='dispatch')
 class RegisterSmartVoteView(DetailView):
     """Saves information about user voting on specific 'smart'.
     Updates counter for that 'smart' to represent current vote count.
@@ -232,15 +250,23 @@ class RegisterSmartVoteView(DetailView):
         #     raise Exception
         return redirect('bank-smart', slug=kwargs['slug'])  #context
         
-
+@method_decorator(login_required, name='dispatch')
 class SmartAssignTeamView(UpdateView):
+    """Assigns a 'smart' to the chosen team. Operation can only be undone from admin panel.
+
+    Args:
+        UpdateView (_type_): _description_
+
+    Returns:
+        _type_: _description_
+    """
     model = Smart
     template_name = ".html"
 
     def get(self, request, *args, **kwargs):        #  request, smart_id
         smrt = get_object_or_404(Smart, slug=kwargs['slug'])
         team = get_object_or_404(CorpoTeam, id=kwargs['team'])
-        print('???')
+        # print('???')
         
         smrt.working_team = team
         smrt.save()
