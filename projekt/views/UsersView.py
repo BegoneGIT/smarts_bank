@@ -16,6 +16,14 @@ from ..forms import UserForm        #, LoginForm
 
 
 class UserLoginView(LoginView):
+    """Simple view to allow for a login
+
+    Args:
+        LoginView (_type_): _description_
+
+    Returns:
+        _type_: _description_
+    """
     model = User
     template_name = "login.html"
     # form = LoginForm
@@ -32,6 +40,16 @@ class UserLoginView(LoginView):
         return reverse("bank-main")
 
 class UserLogoutView(View):
+    """Logout view. We redirect to it and after logging them out
+    we redirect to another view instantly. Therefore user should never
+    see a template loaded.
+
+    Args:
+        View (_type_): _description_
+
+    Returns:
+        _type_: _description_
+    """
     model = User
     template_name = "login.html"
     # form = LoginForm
@@ -45,6 +63,17 @@ class UserLogoutView(View):
 
 
 class AddUserView(HasPermissionsMixin, CreateView):
+    """This is view supposed to be used by admins and managers.
+    It will add an user to 'Smart' suggestion system. Be careful as 
+    manager can create another manager accounts (by design).
+
+    Args:
+        HasPermissionsMixin (_type_): _description_
+        CreateView (_type_): _description_
+
+    Returns:
+        _type_: _description_
+    """
     required_permission = 'create_user'
     template_name = 'AddUserTemplate.html'
     model = User
@@ -60,8 +89,6 @@ class AddUserView(HasPermissionsMixin, CreateView):
             'MAN': 'manager',
             }
 
-    
-    
     def get_context_data(self, **kwargs):        #  request, smart_id
         context = super(AddUserView, self).get_context_data(**kwargs)
 
@@ -79,9 +106,3 @@ class AddUserView(HasPermissionsMixin, CreateView):
         messages.success(self.request, f"New User {user.username} added.")
         return redirect("user-create")
         
-        
-
-
-
-    '''do we really need this? do we need to hide built-in?
-    kind of yes, all users will have some kind of permission'''

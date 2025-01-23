@@ -77,7 +77,19 @@
                     <a href="{% url 'vote-smart' smart.slug %}">
                         <button class="btn btn-success">Vote</button>
                     </a>
+                    {% for team in team_votes %}
+                        Your team ({{ team.corpo_team.team_name }}) votes: {{ team.counter }}
+                    {% endfor %}
+                    
                 </div>
+                {% if user.groups.all.0.name == "manager" or user.is_superuser %}
+                {% for team in all_votes %}
+                <div class="mb-3">
+                        <div>Team ({{ team.corpo_team.team_name }}) votes: {{ team.counter }}</div>
+                        <a href=""><button class="btn btn-primary">Assign project to a team</button></a>
+                </div>
+                {% endfor %}
+                {% endif %}
                 {% comment %} <div class="row mb-2">
                     To this point $ of your team members voted on that project
                 </div> {% endcomment %}

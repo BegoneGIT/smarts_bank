@@ -5,6 +5,9 @@ from django.db import transaction
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
+from django.contrib.auth.models import User
+from django.db.models import F
+
 
 
 # from django.views import View, ListView
@@ -13,7 +16,7 @@ from django.views.generic import DetailView, UpdateView, FormView, ListView, Vie
 from rolepermissions.mixins import HasPermissionsMixin
 
 # from djmoney.money import Money
-from ..models import Smart, Tag, ApplicationField, PriceRange, SmartsVoting, CorpoTeam
+from ..models import Smart, Tag, ApplicationField, PriceRange, SmartsVoting, CorpoTeam, CorpoVoteCounter
 from ..forms import SmartForm
 # import projekt.models     # this causes an error, check how to properly import models
 # from .forms import YourModelForm
@@ -74,17 +77,47 @@ class SmartDisplayView(DetailView):
         context['smart'] = get_object_or_404(Smart, slug=kwargs['object'].slug)
         # print(context['smart'].created_by)
         context['price_range'] = context['smart'].price_range
+        own_c_team = CorpoTeam.objects.filter(team_members=self.request.user)
+        context['team_votes'] = CorpoVoteCounter.objects.filter(corpo_team__in=own_c_team)
+        # for v in context['team_votes']:
+        #     print('v)
+        print(context['team_votes'])
+
+        if self.request.user.is_superuser:
+            context['all_votes'] = CorpoVoteCounter.objects.filter(related_proj=context['smart'])
+            print(context['all_votes'])
+        # subquery = CorpoTeam.
+        # print([f for f in User._meta.get_fields()
+        #     if f.auto_created and not f.concrete])
+        # print(own_c_team)
+        # user = self.request.user
+        # subquery = own_c_team.filter(team_members) #..objects.corpoteam_set.filter(corpo_team__id=self.request.user)
+        # print(subquery)
+        # Publication.objects.filter(article__headline__startswith="NASA")
+        # context['votes'] = SmartsVoting.objects(voter__in, voted_project=context['smart'])
         # print(context['price_range'].price_start.amount, type(context['price_range'].price_start))
 
         return context
     
     def dispatch(self, request, *args, **kwargs):
-        messages.success(self.info, "You have to log in to see the details")
+        if request.user.is_anonymous:
+            messages.info(self.request, "You have to log in to see the details")
         
         return super().dispatch(request, *args, **kwargs)
     
 
 class SmartCreateView(HasPermissionsMixin, CreateView):
+    """Responsible for creating single 'smarts'. Creates price range automatically.
+    If user decided to create new Tag or ApplicationField the view will also create new
+    objects in database to represent them.
+
+    Args:
+        HasPermissionsMixin (_type_): _description_
+        CreateView (_type_): _description_
+
+    Returns:
+        _type_: _description_
+    """
     required_permission = 'create_smart'
     template_name = 'SmartCreateTemplate.html'
     model = Smart
@@ -152,30 +185,54 @@ class SmartCreateView(HasPermissionsMixin, CreateView):
             return set([r.lower() for r in records])
 
 class RegisterSmartVoteView(DetailView):
+    """Saves information about user voting on specific 'smart'.
+    Updates counter for that 'smart' to represent current vote count.
+    If any kind of error happens, the appopriate non-persistent message is sent to inform user.
+
+    Args:
+        DetailView (_type_): _description_
+
+    Returns:
+        _type_: _description_
+    """
     model = Smart
     template_name = 'SmartDisplayTemplate.html'
 
     # def get_context_data(self, **kwargs):
     # def get(self, request, **kwargs):
-    def get_context_data(self, **kwargs):        #  request, smart_id
-        context = super(RegisterSmartVoteView, self).get_context_data(**kwargs)
+    def get(self, request, *args, **kwargs):        #  request, smart_id
+        # context = super(RegisterSmartVoteView, self).get(request, **kwargs)
         # self.object = self.get_object()
         # context=super().get_context_data(**kwargs)
+        smrt = get_object_or_404(Smart, slug=kwargs['slug'])
         user = self.request.user
-        slug = self.request.GET.get('slug')
-        print("SLUG:", slug)
-        smart = get_object_or_404(Smart, slug=kwargs['object'].slug)
+
         # smart = Smart.objects.get(slug=slug)
 
-        try:
-            SmartsVoting.objects.get_or_create(voter=user, voted_project=smart)
-            messages.info(self.request, "You successfully voted for a project.")
-        except Exception:
+        own_c_team = CorpoTeam.objects.filter(team_members=self.request.user)
+        if not own_c_team:
             messages.error(self.request, "For some reason voting did not work properly. Check if you are logged in.")
+            return redirect('bank-smart', slug=kwargs['slug'])  #context
 
-        redirect('bank-smart', slug=slug)
-        return context
+        # try:
+        vote, created = SmartsVoting.objects.get_or_create(voter=user, voted_project=smrt)
+        if created:
+            # print('TEAM\n\t',own_c_team, '\n')
+            for team in own_c_team:
+                obj, created = CorpoVoteCounter.objects.get_or_create(corpo_team=team, related_proj=smrt)
+                if not created:
+                    obj.counter = F("counter") + 1
+                    obj.save(update_fields=["counter"])
+        else:
+            messages.warning(self.request, "You already voted for that project.")
 
-class CorpoTeamAssignView(CreateView):
-    model = CorpoTeam
-    template_name = ".html"
+        messages.info(self.request, "You successfully voted for a project.")
+        # except Exception:
+        #     messages.error(self.request, "For some reason voting did not work properly. Check if you are logged in.")
+        #     raise Exception
+        return redirect('bank-smart', slug=kwargs['slug'])  #context
+        
+
+# class CorpoTeamAssignView(CreateView):
+#     model = CorpoTeam
+#     template_name = ".html"

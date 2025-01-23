@@ -34,19 +34,20 @@
                     <li class="nav-item">
                         <a class="nav-link mr-3">Logged in as {{user.username}}</a>
                     </li>
-                    {% else %}
-                    <li class="nav-item">
-                        <a class="nav-link mr-3" href="{% url 'login' %}">Log in</a>
-                    </li>
                     {% endif %}
                     <li class="nav-item">
                         <a class="nav-link" href="{% url 'bank-main' %}">Home</a>
                     </li>
                     {% comment %} <a class="nav-link" href="#">About</a> {% endcomment %}
-                     
+                    {% if user.is_authenticated %}
                     <li class="nav-item">
                         <a class="nav-link" href="{% url 'logout' %}">Logout</a>
                     </li>
+                    {% else %}
+                    <li class="nav-item">
+                        <a class="nav-link mr-3" href="{% url 'login' %}">Log in</a>
+                    </li>
+                    {% endif %}
                 </ul>
             </div>
         </div>
