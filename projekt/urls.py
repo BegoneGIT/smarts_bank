@@ -16,7 +16,7 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import include, path
-from projekt.views.SmartsBankView import SmartsBankView, SmartDisplayView, SmartCreateView, RegisterSmartVoteView
+from projekt.views.SmartsBankView import SmartsBankView, SmartDisplayView, SmartCreateView, RegisterSmartVoteView, SmartAssignTeamView
 from projekt.views.UsersView import AddUserView, UserLoginView, UserLogoutView
 
 urlpatterns = [
@@ -36,4 +36,6 @@ urlpatterns = [
          name="logout"),
     path('smart/vote/<slug:slug>', RegisterSmartVoteView.as_view(),
          name="vote-smart"),
+     path('smart/<slug:slug>/assign/<int:team>', SmartAssignTeamView.as_view(),
+         name="assign-smart"),
 ]

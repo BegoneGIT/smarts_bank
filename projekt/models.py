@@ -76,6 +76,7 @@ class Smart(models.Model):
     application_field = models.ManyToManyField(ApplicationField)
     price_range = models.ForeignKey(PriceRange, on_delete=models.CASCADE, blank=True)
     slug = models.SlugField()
+    working_team = models.ForeignKey(CorpoTeam, on_delete=models.SET_NULL, blank=True, null=True)
 
     def save(self, *args, **kwargs):
         if not self.id:

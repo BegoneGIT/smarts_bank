@@ -233,6 +233,20 @@ class RegisterSmartVoteView(DetailView):
         return redirect('bank-smart', slug=kwargs['slug'])  #context
         
 
-# class CorpoTeamAssignView(CreateView):
-#     model = CorpoTeam
-#     template_name = ".html"
+class SmartAssignTeamView(UpdateView):
+    model = Smart
+    template_name = ".html"
+
+    def get(self, request, *args, **kwargs):        #  request, smart_id
+        smrt = get_object_or_404(Smart, slug=kwargs['slug'])
+        team = get_object_or_404(CorpoTeam, id=kwargs['team'])
+        print('???')
+        
+        smrt.working_team = team
+        smrt.save()
+        messages.success(self.request, "Project was assignet to a team.")
+
+        return redirect('bank-smart', slug=kwargs['slug'])
+
+
+        

@@ -9,46 +9,59 @@
         <div class="col-8">
             <div class="container">
 
-                <div class="row m-2">
-                    <span class="col-12">tags: </span>
-                    <div class="row m-2">
+                <div class="row  ml-2">
+                    <div class="row">
+                    <span class="col-2 ml-1"> Tags: </span>
                         {% for tag in smart.tag.all %}
                             <span class="col-1 mr-2 rand-colored"> {{ tag.tag_name }} </span>
                         {% endfor %}
                     </div>
                 </div>
-                <div class="row m-2">
-                    SIMILIAR SOFT: 
-                    <span class="col-12 mr-5">{{ smart.similiar_software }}</span>
+                <hr/>
+                <div class="row ml-2">
+                    <span class="col-12 ml-1"> SIMILIAR SOFT:  </span>
+                    <span class="col-12 mr-5 ml-2">{{ smart.similiar_software }}</span>
                 </div>
-                <div class="row m-2">
-                    Usage field:
-                    <div class="row m-2">
+                <hr/>
+                <div class="row">
+                    <div class="row">
+                        <span class="col-2 ml-1"> Usage field: </span>
                     {% for field in smart.application_field.all %}
                         <span class="col-1 rand-colored"> {{ field.field_name }} </span>
                     {% endfor %}
                 </div>
             </div>
-                <div class="row m-2"> 
-                    How it works:
+            <hr/>
+            {% comment %} <div class="container"> {% endcomment %}
+                <div class="row ml-2"> 
+                    <span class="col-2 ml-1"> How it works:</span>
                         <span class="col-12 mr-5">{{ smart.how_it_works }}</span>
                 </div>
-                <div class="row m-2">Details: 
+                <hr/>
+                <div class="row  ml-2">
+                    <span class="col-2 ml-1"> Details: </span>
                     {{ smart.details }}
                 </div>
-                
-                <div class="row m-2">Userbase:
+                <hr/>
+                <div class="row ml-2">
+                    <span class="col-2 ml-1"> Userbase: </span>
                     {{ smart.userbase }}
                 </div>
-                <div class="row m-2">Price range:
+                <hr/>
+                <div class="row ml-2">
+                    <span class="col-2 ml-1"> Price range: </span>
+
                     {{ smart.price_range.price_start.amount }} {{ smart.price_range.price_start.currency }} - {{ smart.price_range.price_end.amount }} {{ smart.price_range.price_end.currency }}
                     <span> Updated on: {{ smart.price_range.updated }} </span>
                 </div>
-                <div class="row m-2">
-                    DESCRIPTION:
+                <hr/>
+                <div class="row ml-2">
+                    <span class="col-2 ml-1"> DESCRIPTION: </span>
                     {{ smart.description }}
                 </div>
+                <hr/>
             </div>
+            {% comment %} </div> {% endcomment %}
         </div>
         <div class="container col-4 border rounded">
             <div class="row m-2 mt-2">
@@ -70,25 +83,34 @@
             </div>
             {% endif %}
             <div class="row m-2 container">
+                {% if not smart.working_team %}
                 <div class="row mb-2">
+                    <span class="">
                     You can vote to work on this project.
+                    </span>
                 </div>
                 <div class="row mb-2">
-                    <a href="{% url 'vote-smart' smart.slug %}">
-                        <button class="btn btn-success">Vote</button>
+                    <a class="d-flex justify-content-center" href="{% url 'vote-smart' smart.slug %}">
+                        <button class="btn btn-success m-auto px-5">Vote</button>
                     </a>
+                    <span class="my-2 mx-0">
                     {% for team in team_votes %}
                         Your team ({{ team.corpo_team.team_name }}) votes: {{ team.counter }}
                     {% endfor %}
-                    
+                    </span>
                 </div>
-                {% if user.groups.all.0.name == "manager" or user.is_superuser %}
-                {% for team in all_votes %}
-                <div class="mb-3">
-                        <div>Team ({{ team.corpo_team.team_name }}) votes: {{ team.counter }}</div>
-                        <a href=""><button class="btn btn-primary">Assign project to a team</button></a>
+                    {% if user.groups.all.0.name == "manager" or user.is_superuser %}
+                    {% for team in all_votes %}
+                    <div class="mb-3">
+                            <div>Team ({{ team.corpo_team.team_name }}) votes: {{ team.counter }}</div>
+                            <a href="{% url 'assign-smart' smart.slug team.id %}"><button class="btn btn-primary">Assign project to a team</button></a>
+                    </div>
+                    {% endfor %}
+                    {% endif %}
+                {% else %}
+                <div class="row mb-2">
+                    The project is already assigned to {{ smart.working_team.team_name }} team.
                 </div>
-                {% endfor %}
                 {% endif %}
                 {% comment %} <div class="row mb-2">
                     To this point $ of your team members voted on that project
@@ -100,7 +122,7 @@
         <small class="text-muted">button to vote for proj</small> {% endcomment %}
     {% comment %} </a> {% endcomment %}
     {% comment %} {% empty %} {% endcomment %}
-    <p>No items found.</p>
+    {% comment %} <p>No items found.</p> {% endcomment %}
 </div>
 {% endblock %}
 {% block script %}

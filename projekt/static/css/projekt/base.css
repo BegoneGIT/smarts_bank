@@ -86,8 +86,9 @@ legend {
 
 .rand-colored {
     float:left;
-    padding: 0.5em;
+    padding: 0.25em;
     margin: 3px; 
     border-radius: 12px;
-    background-color: gray;
+    background-color: lightgray;
+    text-align: center;
 }
